@@ -17,3 +17,8 @@ RUN xcaddy build \
     --with github.com/dunglas/frankenphp/caddy=./caddy/ \
     --with github.com/dunglas/mercure/caddy \
     --with github.com/dunglas/vulcain/caddy
+
+FROM dunglas/frankenphp AS runner
+
+# Replace the official binary by the one contained your custom modules
+COPY --from=builder /usr/local/bin/frankenphp /usr/local/bin/frankenphp
