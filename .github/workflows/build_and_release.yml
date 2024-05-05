@@ -11,28 +11,24 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
-      - name: Build FrankenPHP executable and dependencies
-        run: |
-          docker build . --file Dockerfile --tag frankenphp:latest
-          mkdir -p output/dependencies
-          docker create --name tmp-frankenphp frankenphp:latest
-          docker cp tmp-frankenphp:/usr/bin/frankenphp output/frankenphp
-          docker cp tmp-frankenphp:/deps output/dependencies
-          docker rm tmp-frankenphp
-          zip -r output/frankenphp_with_deps.zip output/frankenphp output/dependencies
+    - name: Build FrankenPHP executable
+      run: |
+        docker build . --file Dockerfile --tag frankenphp:latest
+        mkdir -p output
+        docker run --rm --entrypoint cat frankenphp:latest /usr/local/bin/frankenphp > output/frankenphp
 
-      - name: Upload FrankenPHP with dependencies to GitHub Releases
-        uses: softprops/action-gh-release@v1
-        with:
-          files: output/frankenphp_with_deps.zip
-          tag_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload FrankenPHP executable to GitHub Releases
+      uses: softprops/action-gh-release@v1
+      with:
+        files: output/frankenphp
+        tag_name: ${{ github.ref }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
