@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM dunglas/frankenphp AS builder
+FROM dunglas/frankenphp:latest-builder AS builder
 
 # Install xcaddy from the official Caddy builder image
 COPY --from=caddy:builder /usr/bin/xcaddy /usr/bin/xcaddy
