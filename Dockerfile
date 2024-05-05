@@ -11,14 +11,13 @@ ENV CGO_ENABLED=1 \
 
 # Build FrankenPHP with custom modules including Cloudflare DNS module
 RUN xcaddy build \
-    --output /usr/local/bin/frankenphp \
+    --output /usr/bin/frankenphp \
     --with github.com/dunglas/frankenphp=./ \
     --with github.com/dunglas/frankenphp/caddy=./caddy/ \
     --with github.com/dunglas/mercure/caddy \
     --with github.com/dunglas/vulcain/caddy \
     --with github.com/caddy-dns/cloudflare
 
-FROM dunglas/frankenphp AS runner
-
-# Replace the official binary by the one contained your custom modules
-COPY --from=builder /usr/local/bin/frankenphp /usr/local/bin/frankenphp
+# Find and copy dependencies
+RUN mkdir /deps
+RUN ldd /usr/bin/frankenphp | tr -s '[:blank:]' '\n' | grep '^/' | xargs -I % sh -c 'cp % /deps'
